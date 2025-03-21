@@ -7,16 +7,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My GitHub Pages V2</title>
     <meta name="google-adsense-account" content="ca-pub-9273385058356560">
-    <script>
+  <script>
+        async function getApiKey() {
+            const response = await fetch('https://your-azure-function-url');
+            const data = await response.json();
+            return data.apiKey;
+        }
+
         async function insertData() {
             const account = document.getElementById("account").value;
+            const apiKey = await getApiKey();
 
-            const response = await fetch('https://your-backend-service-url/insert-data', {
+            const response = await fetch('https://sheets.googleapis.com/v4/spreadsheets/YOUR_SPREADSHEET_ID/values/Sheet1!A1:append?valueInputOption=RAW', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${apiKey}`
                 },
-                body: JSON.stringify({ account: account })
+                body: JSON.stringify({
+                    values: [
+                        [account]
+                    ]
+                })
             });
 
             if (response.ok) {
